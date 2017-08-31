@@ -8,6 +8,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import debounce from 'lodash.debounce'
 import defaultStyles from './defaultStyles'
+import { intersectTypes } from './utils';
+
 
 class PlacesAutocomplete extends Component {
   constructor(props) {
@@ -42,9 +44,10 @@ class PlacesAutocomplete extends Component {
     }
 
     // transform snake_case to camelCase
-    const formattedSuggestion = (structured_formatting) => ({
-      mainText: structured_formatting.main_text,
-      secondaryText: structured_formatting.secondary_text,
+    const formattedSuggestion = (item) => ({
+      mainText: item.structured_formatting.main_text,
+      secondaryText: item.structured_formatting.secondary_text,
+      types: item.types
     })
 
     const { highlightFirstSuggestion } = this.props
@@ -55,7 +58,7 @@ class PlacesAutocomplete extends Component {
         placeId: p.place_id,
         active: (highlightFirstSuggestion && idx === 0 ? true : false),
         index: idx,
-        formattedSuggestion: formattedSuggestion(p.structured_formatting),
+        formattedSuggestion: formattedSuggestion(p),
       }))
     })
   }
@@ -246,7 +249,7 @@ class PlacesAutocomplete extends Component {
   }
 
   render() {
-    const { classNames, styles } = this.props
+    const { exceptionTypes, classNames, styles} = this.props
     const { autocompleteItems } = this.state
     const inputProps = this.getInputProps()
 
@@ -261,7 +264,12 @@ class PlacesAutocomplete extends Component {
             id="PlacesAutocomplete__autocomplete-container"
             style={this.inlineStyleFor('autocompleteContainer')}
             className={this.classNameFor('autocompleteContainer')}>
-            {autocompleteItems.map((p, idx) => (
+            {autocompleteItems
+              .filter(p => {
+                const intersection = intersectTypes(p.formattedSuggestion.types, exceptionTypes);
+                return !intersection.length;
+              })
+              .map((p, idx) => (
               <div
                 key={p.placeId}
                 onMouseOver={() => this.setActiveItemAtIndex(p.index)}
@@ -304,6 +312,7 @@ PlacesAutocomplete.propTypes = {
       throw new Error('\'inputProps\' must have \'onChange\'.')
     }
   },
+  exceptionTypes: PropTypes.array,
   onError: PropTypes.func,
   clearItemsOnError: PropTypes.bool,
   onSelect: PropTypes.func,
@@ -353,6 +362,7 @@ PlacesAutocomplete.defaultProps = {
   highlightFirstSuggestion: false,
   googleLogo: true,
   googleLogoType: 'default',
+  exceptionTypes: []
 }
 
 export default PlacesAutocomplete

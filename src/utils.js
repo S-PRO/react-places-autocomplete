@@ -77,3 +77,10 @@ export const geocodeByPlaceId = (placeId, callback) => {
     })
   })
 }
+
+export const intersectTypes = (suggestions, excluded) => {
+  const suggestions_ = new Set(suggestions);
+  const excluded_ = new Set(excluded);
+  const intersection = new Set([...suggestions_].filter(s => excluded_.has(s)));
+  return Array.from(intersection);
+};
