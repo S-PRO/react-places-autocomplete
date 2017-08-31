@@ -85,15 +85,13 @@ class Demo extends React.Component {
       autocompleteContainer: 'Demo__autocomplete-container',
     }
 
-    const AutocompleteItem = ({ formattedSuggestion }) => {
-      return (
-        <div className="Demo__suggestion-item">
-          <i className='fa fa-map-marker Demo__suggestion-icon'/>
-          <strong>{formattedSuggestion.mainText}</strong>{' '}
-          <small className="text-muted">{formattedSuggestion.secondaryText}</small>
-        </div>
-      )
-    }
+    const AutocompleteItem = ({ formattedSuggestion }) => (
+      <div className="Demo__suggestion-item">
+        <i className='fa fa-map-marker Demo__suggestion-icon'/>
+        <strong>{formattedSuggestion.mainText}</strong>{' '}
+        <small className="text-muted">{formattedSuggestion.secondaryText}</small>
+      </div>
+    )
 
 
     const inputProps = {
@@ -126,6 +124,7 @@ class Demo extends React.Component {
             onEnterKeyDown={this.handleSelect}
             classNames={cssClasses}
             inputProps={inputProps}
+            exceptionTypes={['route']}
           />
           {this.state.loading ? <div><i className="fa fa-spinner fa-pulse fa-3x fa-fw Demo__spinner" /></div> : null}
           {!this.state.loading && this.state.geocodeResults ?

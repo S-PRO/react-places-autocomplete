@@ -412,6 +412,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var inputProps = this.getInputProps();
 	
+	      var items = autocompleteItems.filter(function (p) {
+	        var intersection = (0, _utils.intersectTypes)(p.formattedSuggestion.types, exceptionTypes);
+	        return !intersection.length;
+	      });
+	
 	      return _react2.default.createElement(
 	        'div',
 	        {
@@ -419,16 +424,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          style: this.inlineStyleFor('root'),
 	          className: this.classNameFor('root') },
 	        _react2.default.createElement('input', inputProps),
-	        autocompleteItems.length > 0 && _react2.default.createElement(
+	        items.length > 0 && _react2.default.createElement(
 	          'div',
 	          {
 	            id: 'PlacesAutocomplete__autocomplete-container',
 	            style: this.inlineStyleFor('autocompleteContainer'),
 	            className: this.classNameFor('autocompleteContainer') },
-	          autocompleteItems.filter(function (p) {
-	            var intersection = (0, _utils.intersectTypes)(p.formattedSuggestion.types, exceptionTypes);
-	            return !intersection.length;
-	          }).map(function (p, idx) {
+	          items.map(function (p, idx) {
 	            return _react2.default.createElement(
 	              'div',
 	              {

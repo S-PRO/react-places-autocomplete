@@ -253,22 +253,24 @@ class PlacesAutocomplete extends Component {
     const { autocompleteItems } = this.state
     const inputProps = this.getInputProps()
 
+    let items = autocompleteItems
+      .filter(p => {
+        const intersection = intersectTypes(p.formattedSuggestion.types, exceptionTypes);
+        return !intersection.length;
+      })
+
     return (
       <div
         id="PlacesAutocomplete__root"
         style={this.inlineStyleFor('root')}
         className={this.classNameFor('root')}>
         <input {...inputProps} />
-        {autocompleteItems.length > 0 && (
+        {items.length > 0 && (
           <div
             id="PlacesAutocomplete__autocomplete-container"
             style={this.inlineStyleFor('autocompleteContainer')}
             className={this.classNameFor('autocompleteContainer')}>
-            {autocompleteItems
-              .filter(p => {
-                const intersection = intersectTypes(p.formattedSuggestion.types, exceptionTypes);
-                return !intersection.length;
-              })
+            {items
               .map((p, idx) => (
               <div
                 key={p.placeId}
