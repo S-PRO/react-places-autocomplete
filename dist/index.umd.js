@@ -151,20 +151,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'autocompleteCallback',
-	    value: function autocompleteCallback(predictions, status) {
-	      if (status != this.autocompleteOK) {
-	        this.props.onError(status);
-	        if (this.props.clearItemsOnError) {
-	          this.clearAutocomplete();
-	        }
-	        return;
-	      }
+	    value: function autocompleteCallback(items) {
 	
 	      // transform snake_case to camelCase
 	      var formattedSuggestion = function formattedSuggestion(item) {
 	        return {
-	          mainText: item.structured_formatting.main_text,
-	          secondaryText: item.structured_formatting.secondary_text,
+	          text: item.formatted_address,
 	          types: item.types
 	        };
 	      };
@@ -173,9 +165,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	      this.setState({
-	        autocompleteItems: predictions.map(function (p, idx) {
+	        autocompleteItems: items.map(function (p, idx) {
 	          return {
-	            suggestion: p.description,
+	            suggestion: p.formatted_address,
 	            placeId: p.place_id,
 	            active: highlightFirstSuggestion && idx === 0 ? true : false,
 	            index: idx,
@@ -187,12 +179,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'fetchPredictions',
 	    value: function fetchPredictions() {
+	      var _this2 = this;
+	
 	      var value = this.props.inputProps.value;
 	
+	
 	      if (value.length) {
-	        this.autocompleteService.getPlacePredictions(_extends({}, this.props.options, {
-	          input: value
-	        }), this.autocompleteCallback);
+	        (0, _utils.geocodeByAddress)(value).then(function (results) {
+	          console.log('results', results);
+	          _this2.autocompleteCallback(results);
+	        });
 	      }
 	    }
 	  }, {
@@ -378,7 +374,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getInputProps',
 	    value: function getInputProps() {
-	      var _this2 = this;
+	      var _this3 = this;
 	
 	      var defaultInputProps = {
 	        type: "text",
@@ -387,13 +383,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return _extends({}, defaultInputProps, this.props.inputProps, {
 	        onChange: function onChange(event) {
-	          _this2.handleInputChange(event);
+	          _this3.handleInputChange(event);
 	        },
 	        onKeyDown: function onKeyDown(event) {
-	          _this2.handleInputKeyDown(event);
+	          _this3.handleInputKeyDown(event);
 	        },
 	        onBlur: function onBlur(event) {
-	          _this2.handleInputOnBlur(event);
+	          _this3.handleInputOnBlur(event);
 	        },
 	        style: this.inlineStyleFor('input'),
 	        className: this.classNameFor('input')
@@ -402,7 +398,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this3 = this;
+	      var _this4 = this;
 	
 	      var _props2 = this.props,
 	          exceptionTypes = _props2.exceptionTypes,
@@ -436,20 +432,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	              {
 	                key: p.placeId,
 	                onMouseOver: function onMouseOver() {
-	                  return _this3.setActiveItemAtIndex(p.index);
+	                  return _this4.setActiveItemAtIndex(p.index);
 	                },
 	                onMouseDown: function onMouseDown() {
-	                  return _this3.selectAddress(p.suggestion, p.placeId);
+	                  return _this4.selectAddress(p.suggestion, p.placeId);
 	                },
 	                onTouchStart: function onTouchStart() {
-	                  return _this3.setActiveItemAtIndex(p.index);
+	                  return _this4.setActiveItemAtIndex(p.index);
 	                },
 	                onTouchEnd: function onTouchEnd() {
-	                  return _this3.selectAddress(p.suggestion, p.placeId);
+	                  return _this4.selectAddress(p.suggestion, p.placeId);
 	                },
-	                style: p.active ? _this3.inlineStyleFor('autocompleteItem', 'autocompleteItemActive') : _this3.inlineStyleFor('autocompleteItem'),
-	                className: p.active ? _this3.classNameFor('autocompleteItem', 'autocompleteItemActive') : _this3.classNameFor('autocompleteItem') },
-	              _this3.props.autocompleteItem({ suggestion: p.suggestion, formattedSuggestion: p.formattedSuggestion })
+	                style: p.active ? _this4.inlineStyleFor('autocompleteItem', 'autocompleteItemActive') : _this4.inlineStyleFor('autocompleteItem'),
+	                className: p.active ? _this4.classNameFor('autocompleteItem', 'autocompleteItemActive') : _this4.classNameFor('autocompleteItem') },
+	              _this4.props.autocompleteItem({ suggestion: p.suggestion, formattedSuggestion: p.formattedSuggestion })
 	            );
 	          }),
 	          this.props.googleLogo && _react2.default.createElement(
