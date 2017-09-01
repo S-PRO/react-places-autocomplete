@@ -64,7 +64,6 @@ class PlacesAutocomplete extends Component {
     if (value.length) {
       geocodeByAddress(value)
         .then(results => {
-          console.log('results', results);
           this.autocompleteCallback(results)
         })
     }

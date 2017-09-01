@@ -186,7 +186,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      if (value.length) {
 	        (0, _utils.geocodeByAddress)(value).then(function (results) {
-	          console.log('results', results);
 	          _this2.autocompleteCallback(results);
 	        });
 	      }
