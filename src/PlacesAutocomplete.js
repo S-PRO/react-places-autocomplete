@@ -8,7 +8,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import debounce from 'lodash.debounce'
 import defaultStyles from './defaultStyles'
-import { intersectTypes } from './utils';
+import {geocodeByAddress, intersectTypes} from './utils';
 
 
 class PlacesAutocomplete extends Component {
@@ -36,25 +36,19 @@ class PlacesAutocomplete extends Component {
     this.autocompleteOK = google.maps.places.PlacesServiceStatus.OK
   }
 
-  autocompleteCallback(predictions, status) {
-    if (status != this.autocompleteOK) {
-      this.props.onError(status)
-      if (this.props.clearItemsOnError) { this.clearAutocomplete() }
-      return
-    }
+  autocompleteCallback(items) {
 
     // transform snake_case to camelCase
     const formattedSuggestion = (item) => ({
-      mainText: item.structured_formatting.main_text,
-      secondaryText: item.structured_formatting.secondary_text,
+      text: item.formatted_address,
       types: item.types
     })
 
     const { highlightFirstSuggestion } = this.props
 
     this.setState({
-      autocompleteItems: predictions.map((p, idx) => ({
-        suggestion: p.description,
+      autocompleteItems: items.map((p, idx) => ({
+        suggestion: p.formatted_address,
         placeId: p.place_id,
         active: (highlightFirstSuggestion && idx === 0 ? true : false),
         index: idx,
@@ -64,12 +58,15 @@ class PlacesAutocomplete extends Component {
   }
 
   fetchPredictions() {
-    const { value } = this.props.inputProps
+
+    const { value } = this.props.inputProps;
+
     if (value.length) {
-      this.autocompleteService.getPlacePredictions({
-        ...this.props.options,
-        input: value
-      }, this.autocompleteCallback)
+      geocodeByAddress(value)
+        .then(results => {
+          console.log('results', results);
+          this.autocompleteCallback(results)
+        })
     }
   }
 
